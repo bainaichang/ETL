@@ -1,7 +1,7 @@
 package core.flowdata;
 
-import ETLTools.data.interFace.RowLive;
-import ETLTools.data.interFace.RowSelect;
+import core.intf.RowLive;
+import core.intf.RowSelect;
 import lombok.Getter;
 import lombok.Setter;
 

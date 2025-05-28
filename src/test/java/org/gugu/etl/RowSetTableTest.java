@@ -1,7 +1,6 @@
 package org.gugu.etl;
 
-import ETLTools.data.Row;
-import ETLTools.data.RowSetTable;
+import core.flowdata.*;
 import org.junit.jupiter.api.Test;
 
 import java.util.Arrays;
