@@ -1,7 +1,7 @@
 package plugin;
 
 import anno.Input;
-import core.IInput;
+import core.intf.IInput;
 
 @Input(type = "json")
 public class JsonInput implements IInput {

@@ -1,4 +1,4 @@
-package ETLTools.data.interFace;
+package core.intf;
 
 import ETLTools.data.Row;
 
