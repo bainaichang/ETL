@@ -79,10 +79,9 @@ public class RowSetTable {
         return result;
     }
     
-    public RowSetTable[] groupBy(RowSelect selectField) {
+    public GroupByTable groupBy(RowSelect selectField) {
         List<RowSetTable> result = new ArrayList<>();
-        // 未完成。。。
-        return result.toArray(new RowSetTable[0]);
+        return null;
     }
     
     @Override
