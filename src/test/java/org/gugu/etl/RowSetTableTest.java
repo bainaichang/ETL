@@ -25,4 +25,21 @@ public class RowSetTableTest {
                      .orderBy(Comparator.comparingInt(l -> Integer.parseInt((String) l.get(1))));
         System.out.println(table);
     }
+    @Test
+    public void test_2() {
+        RowSetTable table = new RowSetTable(Arrays.asList("id", "age", "sex","address"));
+        Row row1 = new Row();
+        row1.addAll(Arrays.asList("0001", "18", "man","北"));
+        Row row2 = new Row();
+        row2.addAll(Arrays.asList("0002", "20", "woman","南"));
+        Row row3 = new Row();
+        row3.addAll(Arrays.asList("0003", "30", "man","北"));
+        Row row4 = new Row();
+        row4.addAll(Arrays.asList("0004", "20", "woman","南"));
+        Row row5 = new Row();
+        row5.addAll(Arrays.asList("0005", "20", "woman","北"));
+        table.addRow(new Row[]{row1, row2, row3, row4, row5});
+        GroupByTable groupByTable = table.groupBy(row -> new String[]{"sex", "address","age"});
+        System.out.println(groupByTable);
+    }
 }
