@@ -20,6 +20,32 @@ public class RowSetTable {
         this.field.addAll(field);
     }
     
+    public boolean haveField(String field) {
+        return this.field.contains(field);
+    }
+    
+    public int getFieldIndex(String field) {
+        if (!haveField(field)){
+            System.err.println("字段不存在！，返回-1下标！");
+            return -1;
+        }
+        return this.field.indexOf(field);
+    }
+    
+    public Set<Object> fieldValueSet(String field) {
+        if (!haveField(field)){
+            System.err.println("字段不存在！，返回null！");
+            return null;
+        }
+        HashSet<Object> set = new HashSet<>();
+        int index = getFieldIndex(field);
+        for (Row row : rowList) {
+            set.add(row.get(index));
+        }
+        return set;
+    }
+    
+    
     public void addRow(Row row) {
         if (row.size() == field.size()) {
             rowList.add(row);
@@ -80,8 +106,14 @@ public class RowSetTable {
     }
     
     public GroupByTable groupBy(RowSelect selectField) {
-        List<RowSetTable> result = new ArrayList<>();
-        return null;
+        String[] groupBy = selectField.select(this.field);
+        for (String field : groupBy) {
+            if (!this.field.contains(field)) {
+                System.err.println("groupBy错误！字段不存在！");
+                return null;
+            }
+        }
+        return new GroupByTable(groupBy, this);
     }
     
     @Override
