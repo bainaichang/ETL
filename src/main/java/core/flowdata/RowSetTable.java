@@ -2,6 +2,7 @@ package core.flowdata;
 
 import core.intf.RowLive;
 import core.intf.RowSelect;
+import core.intf.RowUpdate;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -20,20 +21,25 @@ public class RowSetTable {
         this.field.addAll(field);
     }
     
+    public RowSetTable(List<String> field, List<Row> rowList) {
+        this.field.addAll(field);
+        this.rowList = rowList;
+    }
+    
     public boolean haveField(String field) {
         return this.field.contains(field);
     }
     
     public int getFieldIndex(String field) {
-        if (!haveField(field)){
+        if (! haveField(field)) {
             System.err.println("字段不存在！，返回-1下标！");
-            return -1;
+            return - 1;
         }
         return this.field.indexOf(field);
     }
     
     public Set<Object> fieldValueSet(String field) {
-        if (!haveField(field)){
+        if (! haveField(field)) {
             System.err.println("字段不存在！，返回null！");
             return null;
         }
@@ -44,7 +50,6 @@ public class RowSetTable {
         }
         return set;
     }
-    
     
     public void addRow(Row row) {
         if (row.size() == field.size()) {
@@ -64,6 +69,14 @@ public class RowSetTable {
         for (Row row : table) {
             this.addRow(row);
         }
+    }
+    
+    public RowSetTable update(RowUpdate update) {
+        for (int i = 0; i < this.rowList.size(); i++) {
+            Row row = this.rowList.get(i);
+            update.update(row);
+        }
+        return new RowSetTable(field, rowList);
     }
     
     public RowSetTable where(RowLive compare) {
@@ -108,7 +121,7 @@ public class RowSetTable {
     public GroupByTable groupBy(RowSelect selectField) {
         String[] groupBy = selectField.select(this.field);
         for (String field : groupBy) {
-            if (!this.field.contains(field)) {
+            if (! this.field.contains(field)) {
                 System.err.println("groupBy错误！字段不存在！");
                 return null;
             }
@@ -120,7 +133,7 @@ public class RowSetTable {
     public String toString() {
         StringBuffer builder = new StringBuffer();
         builder.append(String.join(", ", field))
-          .append("\n");
+               .append("\n");
         for (Row row : rowList) {
             Object[] array = row.toArray();
             for (int i = 0; i < array.length; i++) {
