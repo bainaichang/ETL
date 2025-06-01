@@ -6,15 +6,16 @@ import java.util.List;
 public class Step {
     protected Integer stepId;
     protected String description;
-    protected String type;//大类-子模式
-    protected String domain;
-    protected List<String> parentStepId = new ArrayList<>();
-    protected List<String> childStepId = new ArrayList<>();
+    protected String subType;//子类型
+    protected String config;//具体配置
+    protected String domain;//主类型
+    protected List<String> parentStepId = new ArrayList<>();//上游ID
+    protected List<String> childStepId = new ArrayList<>();//下游ID
     
-    public Step(Integer stepId, String description, String type, String domain, List<String> parentStepId, List<String> childStepId) {
+    public Step(Integer stepId, String description, String subType, String domain, List<String> parentStepId, List<String> childStepId) {
         this.stepId = stepId;
         this.description = description;
-        this.type = type;
+        this.subType = subType;
         this.domain = domain;
         this.parentStepId = parentStepId;
         this.childStepId = childStepId;
@@ -39,12 +40,12 @@ public class Step {
         this.description = description;
     }
     
-    public String getType() {
-        return type;
+    public String getSubType() {
+        return subType;
     }
     
-    public void setType(String type) {
-        this.type = type;
+    public void setSubType(String type) {
+        this.subType = type;
     }
     
     public String getDomain() {
@@ -61,6 +62,12 @@ public class Step {
     
     public void setParentStepId(List<String> parentStepId) {
         this.parentStepId = parentStepId;
+    }
+    public String getConfig() {
+        return config;
+    }
+    public void setConfig(String config) {
+        this.config = config;
     }
     
     public List<String> getChildStepId() {

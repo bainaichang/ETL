@@ -1,5 +1,7 @@
 package core.intf;
 
+import core.flowdata.RowSetTable;
+
 public interface IInput {
-    void deal(Object data);
+    RowSetTable deal(Object data);
 }

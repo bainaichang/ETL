@@ -134,4 +134,7 @@ public class RowSetTable {
         }
         return builder.toString();
     }
+    public List<String> getField() {
+        return field;
+    }
 }

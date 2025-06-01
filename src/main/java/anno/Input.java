@@ -4,7 +4,7 @@ package anno;
 import java.lang.annotation.*;
 
 @MetaAnno(
-        value = {"core.interFace.IInput"}
+        value = {"core.intf.IInput"}
 )
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
