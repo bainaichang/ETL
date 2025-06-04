@@ -1,13 +1,10 @@
 import core.Scheduler;
 import org.junit.jupiter.api.Test;
-import core.Factory;
 import runtask.Step;
 import runtask.StepList;
-
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
+
 
 
 public class PleaseTestMe{
