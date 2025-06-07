@@ -12,3 +12,4 @@ public class Console implements IOutput {
         System.out.println(config.toString());
     }
 }
+
