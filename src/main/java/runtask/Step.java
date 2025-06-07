@@ -10,27 +10,30 @@ public class Step {
     protected Integer stepId;
     protected String description;
     protected String subType;//子类型
-    protected HashMap<String,Object> config=new HashMap<>();//具体配置
+    protected HashMap<String, Object> config = new HashMap<>();//具体配置
     protected String domain;//主类型
     protected List<String> parentStepId = new ArrayList<>();//上游ID
     protected List<String> childStepId = new ArrayList<>();//下游ID
     protected RowSetTable subData;
-
-    public Step(Integer stepId, String description, String subType, String domain, List<String> parentStepId, List<String> childStepId,HashMap<String,Object> config) {
+    
+    public Step(Integer stepId, String description, String subType, String domain, List<String> parentStepId, List<String> childStepId, HashMap<String, Object> config) {
         this.stepId = stepId;
         this.description = description;
         this.subType = subType;
         this.domain = domain;
         this.parentStepId = parentStepId;
         this.childStepId = childStepId;
-        this.config=config;
+        this.config = config;
     }
+    
     public RowSetTable getSubData() {
         return subData;
     }
+    
     public void setSubData(RowSetTable subData) {
         this.subData = subData;
     }
+    
     public Step() {
     }
     
@@ -78,18 +81,21 @@ public class Step {
         this.parentStepId = parentStepId;
         return this;
     }
+    
     public HashMap<String, Object> getConfig() {
         return config;
     }
-
-    public Step withConfig(String key,Object value) {
-        this.config.put(key,value);
+    
+    public Step withConfig(String key, Object value) {
+        this.config.put(key, value);
         return this;
     }
+    
     public Step withConfig(HashMap<String, Object> config) {
         this.config = config != null ? config : new HashMap<>();
         return this;
     }
+    
     public List<String> getChildStepId() {
         return childStepId;
     }
@@ -98,4 +104,15 @@ public class Step {
         this.childStepId = childStepId;
         return this;
     }
+    
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) return true;
+        if (obj == null || getClass() != obj.getClass()) return false;
+        
+        Step other = (Step) obj;
+        
+        return stepId != null && stepId.equals(other.stepId);
+    }
+    
 }

@@ -29,6 +29,7 @@ public class ProcessFileController {
         result.put("status", 200);
         result.put("message", "ok");
         result.put("files", JSONUtil.toJsonStr(filenames));
+        result.put("filepath",StartUp.dataDir);
         return JSONUtil.toJsonStr(result);
     }
     
@@ -45,8 +46,7 @@ public class ProcessFileController {
         StringBuffer sb = new StringBuffer();
         FileUtil.readLines(data, StandardCharsets.UTF_8)
                 .forEach(sb::append);
-        result.put("data", sb.toString());
-        return JSONUtil.toJsonStr(result);
+        return sb.toString();
     }
     @PostMapping("/create")
     @ResponseBody
