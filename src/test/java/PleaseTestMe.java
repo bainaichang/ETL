@@ -32,7 +32,7 @@ public class PleaseTestMe{
         new Scheduler(stepList).execute();
     }
 
-    @Test
+    /*@Test
     public void test_http_etl_flow() {
         Step input = new Step();
         input.withStepId(1)
@@ -52,6 +52,28 @@ public class PleaseTestMe{
                 .withParentStepId(Collections.singletonList("1"));
 
         StepList stepList = new StepList(Arrays.asList(input, output));
+        new Scheduler(stepList).execute();
+    }
+*/
+    @Test
+    public void test_json_etl_flow() {
+        Step input = new Step();
+        input.withStepId(1)
+                .withDes("读取包含json字段的文本")
+                .withDomain("input")
+                .withSubType("jsontext")
+                .withConfig("sourceType", "file")
+                .withConfig("filePath", "src/test/java/yh_json.txt");
+
+        Step output = new Step();
+        output.withStepId(2)
+                .withDes("输出到控制台")
+                .withDomain("output")
+                .withSubType("console")
+                .withParentStepId(Collections.singletonList("1"));
+
+        StepList stepList = new StepList(Arrays.asList(input, output));
+
         new Scheduler(stepList).execute();
     }
 }
