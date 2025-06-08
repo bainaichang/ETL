@@ -31,8 +31,7 @@ public class PleaseTestMe{
 
         new Scheduler(stepList).execute();
     }
-
-    /*@Test
+    @Test
     public void test_http_etl_flow() {
         Step input = new Step();
         input.withStepId(1)
@@ -54,7 +53,7 @@ public class PleaseTestMe{
         StepList stepList = new StepList(Arrays.asList(input, output));
         new Scheduler(stepList).execute();
     }
-*/
+
     @Test
     public void test_json_etl_flow() {
         Step input = new Step();
