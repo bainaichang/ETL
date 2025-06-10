@@ -11,8 +11,6 @@ import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
-import java.util.Arrays;
-import java.util.List;
 import java.util.Map;
 
 @Output(type = "database")
@@ -41,7 +39,7 @@ public class DatabaseOutput implements IOutput {
         Map<String, Object> confMap = (Map<String, Object>) config;
         String connectionId = (String) confMap.get("connectionId");
         String tableName = (String) confMap.get("tableName");
-        RowSetTable table = (RowSetTable) confMap.get("table");
+        RowSetTable table = (RowSetTable) confMap.get("_input");
 
         // 参数校验
         if (connectionId == null || connectionId.isEmpty() ||
