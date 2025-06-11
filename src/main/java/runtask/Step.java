@@ -16,6 +16,38 @@ public class Step {
     protected List<String> childStepId = new ArrayList<>();//下游ID
     protected RowSetTable subData;
     
+    public void setStepId(Integer stepId) {
+        this.stepId = stepId;
+    }
+    
+    public String getDescription() {
+        return description;
+    }
+    
+    public void setDescription(String description) {
+        this.description = description;
+    }
+    
+    public void setSubType(String subType) {
+        this.subType = subType;
+    }
+    
+    public void setConfig(HashMap<String, Object> config) {
+        this.config = config;
+    }
+    
+    public void setDomain(String domain) {
+        this.domain = domain;
+    }
+    
+    public void setParentStepId(List<String> parentStepId) {
+        this.parentStepId = parentStepId;
+    }
+    
+    public void setChildStepId(List<String> childStepId) {
+        this.childStepId = childStepId;
+    }
+    
     public Step(Integer stepId, String description, String subType, String domain, List<String> parentStepId, List<String> childStepId, HashMap<String, Object> config) {
         this.stepId = stepId;
         this.description = description;

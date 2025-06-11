@@ -1,5 +1,6 @@
 package runtask;
 
+import cn.hutool.json.JSONConfig;
 import cn.hutool.json.JSONUtil;
 
 import java.util.ArrayList;
@@ -9,6 +10,7 @@ import java.util.function.Predicate;
 
 public class StepList {
     List<Step> data = new ArrayList<>();
+    
     
     public void addStep(Step step){
         if (this.data.contains(step)){
@@ -26,7 +28,7 @@ public class StepList {
     @Override
     public String toString() {
         HashMap<Object,Object> map = new HashMap<>();
-        map.put("data",JSONUtil.toJsonStr(this.data));
+        map.put("data",data);
         return JSONUtil.toJsonStr(map);
     }
     

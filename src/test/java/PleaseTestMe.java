@@ -1,8 +1,15 @@
+import cn.hutool.core.io.FileUtil;
+import cn.hutool.json.JSONUtil;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import core.Scheduler;
+import org.gugu.etl.StartUp;
 import org.junit.jupiter.api.Test;
 import runtask.Step;
 import runtask.StepList;
 
+import java.io.File;
+import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.Collections;
 
@@ -52,15 +59,28 @@ public class PleaseTestMe {
         
         Step output_1 = new Step();
         output_1.withStepId(2)
-              .withDes("yYy")
-              .withDomain("output")
-              .withSubType("xxx")
-              .withParentStepId(Collections.singletonList("1"));
+                .withDes("yYy")
+                .withDomain("output")
+                .withSubType("xxx")
+                .withParentStepId(Collections.singletonList("1"));
         StepList sl = new StepList();
         sl.addStep(input);
         sl.addStep(output);
         sl.updateStep(output_1);
-        sl.rmStep(input.getStepId().toString());
+        sl.rmStep(input.getStepId()
+                       .toString());
         System.out.println(sl);
+    }
+    
+    @Test
+    public void test_JSONToBean() throws JsonProcessingException {
+        File data = new File("C:\\Users\\白乃常\\.etl\\process_files\\a001.json");
+        StringBuffer sb = new StringBuffer();
+        FileUtil.readLines(data, StandardCharsets.UTF_8)
+                .forEach(sb::append);
+        String json = sb.toString();
+        ObjectMapper mapper = new ObjectMapper();
+        StepList response = mapper.readValue(json, StepList.class);
+        System.out.println(response);
     }
 }

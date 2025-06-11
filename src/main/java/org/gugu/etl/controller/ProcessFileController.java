@@ -35,9 +35,10 @@ public class ProcessFileController {
     
     @GetMapping("/cat_file")
     @ResponseBody
-    public String catFile(@RequestParam(required = true) String filename) {
+    public String catFile(@RequestParam(required = true) String fileName) {
         HashMap<Object, Object> result = new HashMap<>();
-        File data = new File(StartUp.dataDir + StartUp.fileSeparator + filename);
+        File data = new File(StartUp.dataDir + StartUp.fileSeparator + fileName);
+        System.out.println("查看"+ fileName +"文件");
         if (! FileUtil.exist(data)) {
             result.put("status", 400);
             result.put("message", "file is not exist");
@@ -49,19 +50,20 @@ public class ProcessFileController {
         return sb.toString();
     }
     @PostMapping("/create")
-    @ResponseBody
-    public String create(@RequestParam String filename){
+    @ResponseBody // 添加此注解，确保返回值直接写入响应体
+    public String create(@RequestParam String fileName){
         HashMap<Object, Object> result = new HashMap<>();
-        File data = new File(StartUp.dataDir + StartUp.fileSeparator + filename);
+        File data = new File(StartUp.dataDir + StartUp.fileSeparator + fileName);
         if (FileUtil.exist(data)) {
-            result.put("status", 403);
+            result.put("status", 400);
             result.put("message", "file is exist");
             return JSONUtil.toJsonStr(result);
         }
-        FileUtil.touch(filename);
+        FileUtil.touch(data);
         result.put("status",200);
         result.put("message","ok");
         result.put("filepath",data.getAbsoluteFile());
+        System.out.println("创建了流程文件: " + data.getAbsolutePath());
         return JSONUtil.toJsonStr(result);
     }
 }
