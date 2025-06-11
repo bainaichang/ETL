@@ -28,7 +28,7 @@ import java.util.regex.Pattern;
  * }
  */
 @Input(type = "jsontext")
-public class JsonTextInput implements IInput {
+public class JsonInput implements IInput {
 
     @Override
     public RowSetTable deal(Object config) {

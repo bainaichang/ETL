@@ -8,7 +8,7 @@ import java.util.Collections;
 
 
 public class PleaseTestMe {
-/*
+
     @Test
     public void test_csv_etl_flow() {
         Step input = new Step();
@@ -32,9 +32,9 @@ public class PleaseTestMe {
 
         new Scheduler(stepList).execute();
     }
-*/
 
-/*
+
+
     @Test
     public void test_http_etl_flow() {
         Step input = new Step();
@@ -57,18 +57,17 @@ public class PleaseTestMe {
         StepList stepList = new StepList(Arrays.asList(input, output));
         new Scheduler(stepList).execute();
     }
-*/
 
     @Test
     public void test_json_etl_flow() {
-    /*    // file 模式：从文件中读取数据
+        // file 模式：从文件中读取数据
         Step inputFile = new Step();
         inputFile.withStepId(1)
                 .withDes("从文件读取包含 json 字段的文本")
                 .withDomain("input")
                 .withSubType("jsontext")
                 .withConfig("mode", "file")
-                .withConfig("filePath", "src/test/java/yh_json.txt");*/
+                .withConfig("filePath", "src/test/java/yh_json.txt");
 
         // field 模式：从字段直接读取数据
         Step inputField = new Step();
@@ -101,11 +100,11 @@ public class PleaseTestMe {
                 .withParentStepId(Collections.singletonList("1"));
 
         //file 模式
-        //StepList stepList = new StepList(Arrays.asList(inputFile, output));
+        StepList stepList = new StepList(Arrays.asList(inputFile, output));
         // field 模式
         //StepList stepList = new StepList(Arrays.asList(inputField, output));
         // 未来支持 url 模式
-        StepList stepList = new StepList(Arrays.asList(inputUrl, output));
+        //StepList stepList = new StepList(Arrays.asList(inputUrl, output));
 
         new Scheduler(stepList).execute();
     }
