@@ -60,6 +60,7 @@ public class PleaseTestMe {
 
     @Test
     public void test_json_etl_flow() {
+
         // file 模式：从文件中读取数据
         Step inputFile = new Step();
         inputFile.withStepId(1)
@@ -92,12 +93,23 @@ public class PleaseTestMe {
                 .withConfig("mode", "url")
                 .withConfig("url", "");
 
+
+        Step input = new Step();
+        input.withStepId(1)
+                .withDes("读取包含json字段的文本")
+                .withDomain("input")
+                .withSubType("jsontext")
+                .withConfig("sourceType", "file")
+                .withConfig("filePath", "src/test/java/yh_json.txt");
+
+
         Step output = new Step();
         output.withStepId(2)
                 .withDes("输出到控制台")
                 .withDomain("output")
                 .withSubType("console")
                 .withParentStepId(Collections.singletonList("1"));
+
 
         //file 模式
         StepList stepList = new StepList(Arrays.asList(inputFile, output));
@@ -110,3 +122,5 @@ public class PleaseTestMe {
     }
 
 }
+
+
