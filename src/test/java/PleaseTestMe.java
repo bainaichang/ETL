@@ -117,7 +117,6 @@ public class PleaseTestMe {
         //StepList stepList = new StepList(Arrays.asList(inputField, output));
         // 未来支持 url 模式
         //StepList stepList = new StepList(Arrays.asList(inputUrl, output));
-
         new Scheduler(stepList).execute();
     }
 }
