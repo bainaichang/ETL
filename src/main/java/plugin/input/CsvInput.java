@@ -1,4 +1,4 @@
-package plugin;
+package plugin.input;
 
 import anno.Input;
 import cn.hutool.core.io.FileUtil;
@@ -9,7 +9,7 @@ import lombok.var;
 
 import java.io.File;
 import java.nio.charset.StandardCharsets;
-import java.util.Map;import java.util.Objects;
+import java.util.Map;
 
 @Input(type = "csv") // 与Factory扫描的注解类型一致
 public class CsvInput implements IInput {

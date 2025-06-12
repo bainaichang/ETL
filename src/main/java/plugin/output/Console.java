@@ -1,4 +1,4 @@
-package plugin;
+package plugin.output;
 
 import anno.Output;
 import core.Channel;
