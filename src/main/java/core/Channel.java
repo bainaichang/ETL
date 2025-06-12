@@ -53,11 +53,33 @@ public class Channel<T> implements IChannel<T> {
     public synchronized void close(){
         closed=true;
         notifyAll();
-        executor.shutdown();
+//        executor.shutdown();
     }
 
     @Override
     public boolean isClosed(){
         return closed;
+    }
+
+    @Override
+    public  synchronized void onReceive(Consumer<T> handler,Runnable onComplete){
+        this.consumer=handler;
+        executor.submit(()->{
+           try{
+               while (!closed||!queue.isEmpty()){
+                   T row;
+                   synchronized (this){
+                       while(queue.isEmpty()&&!closed) wait();
+                       row=queue.poll();
+                   }
+                   if(row!=null&&consumer!=null)
+                       consumer.accept(row);
+               }
+           }catch (InterruptedException e){}
+           finally {
+                if(onComplete!=null)
+                    onComplete.run();
+           }
+        });
     }
 }
