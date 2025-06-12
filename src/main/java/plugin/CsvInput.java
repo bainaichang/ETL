@@ -2,131 +2,81 @@ package plugin;
 
 import anno.Input;
 import cn.hutool.core.io.FileUtil;
+import core.Channel;
 import core.flowdata.Row;
-import core.flowdata.RowSetTable;
 import core.intf.IInput;
+import lombok.var;
 
 import java.io.File;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
-import java.util.stream.IntStream;
+import java.util.Map;import java.util.Objects;
 
-@Input(type = "csv")
+@Input(type = "csv") // 与Factory扫描的注解类型一致
 public class CsvInput implements IInput {
+    private Map<String, Object> config; // 保存初始化配置
+    private char delimiter = ',';       // 默认分隔符
+    private char quoteChar = '"';       // 默认引号字符
+    private boolean hasHeader = true;   // 默认有表头
+    private String filePath;
 
-    /**
-     * @brief CSV 输入插件，用于读取 CSV 文件并转换为 RowSetTable。
-     *
-     * @param config 类型为 Map 的配置对象
-     * {
-     *   "filePath": "文件路径",          // 必选，CSV 文件路径
-     *   "delimiter": "字段分隔符",       // 可选，默认逗号(,)
-     *   "quoteChar": "引号字符",         // 可选，默认双引号(")
-     *   "hasHeader": boolean             // 可选，默认 true，是否有表头
-     * }
-     *
-     * @return RowSetTable 包含 CSV 数据的表格对象，失败时返回空对象
-     */
     @Override
-    public RowSetTable deal(Object config) {
-        if (!(config instanceof Map<?, ?>)) {
-            System.err.println("CSV配置不是Map类型！");
-            return null;
-        }
-
-        // 读config
-        Map<String, Object> confMaping = (Map<String, Object>) config;
-        String filePath = (String) confMaping.get("filePath");
-        String delimiterStr = (String) confMaping.getOrDefault("delimiter", ",");
-        String quoteStr = (String) confMaping.getOrDefault("quoteChar", "\"");
-        Boolean hasHeader = (Boolean) confMaping.getOrDefault("hasHeader", true);
+    public void init(Map<String, Object> cfg) {
+        // 初始化配置并校验
+        this.config = cfg;
+        this.filePath = (String) cfg.get("filePath");
+        String delimiterStr = (String) cfg.getOrDefault("delimiter", ",");
+        String quoteStr = (String) cfg.getOrDefault("quoteChar", "\"");
+        this.hasHeader = (Boolean) cfg.getOrDefault("hasHeader", true);
 
         // 参数校验
         if (filePath == null || filePath.isEmpty()) {
-            System.err.println("缺少文件路径！");
-            return null;
+            throw new IllegalArgumentException("缺少文件路径！");
         }
-
-        if (delimiterStr == null || delimiterStr.length() != 1) {
-            System.err.println("分隔符必须是一个字符");
-            return null;
+        if (delimiterStr.length() != 1) {
+            throw new IllegalArgumentException("分隔符必须是一个字符");
         }
-
-        if (quoteStr == null || quoteStr.length() != 1) {
-            System.err.println("引号字符必须是一个字符");
-            return null;
+        if (quoteStr.length() != 1) {
+            throw new IllegalArgumentException("引号字符必须是一个字符");
         }
-
-        char delimiter = delimiterStr.charAt(0);
-        char quoteChar = quoteStr.charAt(0);
-
-        File file = new File(filePath);
-        if (!file.exists()) {
-            System.err.println("文件不存在: " + filePath);
-            return null;
-        }
-
-        List<String> lines = FileUtil.readLines(file, StandardCharsets.UTF_8);
-        if (lines.isEmpty()) {
-            System.err.println("CSV文件为空");
-            return null;
-        }
-
-        // 表头
-        String[] header;
-        List<String> dataLines;
-        try {
-            if (hasHeader) {
-                header = parseCsvLine(lines.get(0), delimiter, quoteChar);
-                dataLines = lines.subList(1, lines.size());
-            } else {
-                int columnCount = parseCsvLine(lines.get(0), delimiter, quoteChar).length;
-                header = IntStream.range(0, columnCount)
-                        .mapToObj(i -> "Column" + (i + 1))
-                        .toArray(String[]::new);
-                dataLines = lines;
-            }
-        } catch (IllegalArgumentException e) {
-            System.err.println("解析表头失败：" + e.getMessage());
-            return null;
-        }
-
-        RowSetTable table = new RowSetTable(Arrays.asList(header));
-
-        // 数据行处理
-        for (String line : dataLines) {
-            try {
-                String[] cols = parseCsvLine(line.trim(), delimiter, quoteChar);
-                Row row = new Row();
-                row.addAll(Arrays.asList(cols));
-                table.addRow(row);
-            } catch (IllegalArgumentException e) {
-                System.err.println("解析数据行失败: " + line + "，错误：" + e.getMessage());
-                continue;
-            }
-        }
-
-        return table;
+        this.delimiter = delimiterStr.charAt(0);
+        this.quoteChar = quoteStr.charAt(0);
     }
 
-
-     //解析一行 CSV 数据
-
-    private String[] parseCsvLine(String line, char delimiter, char quoteChar) {
-        if (line == null || line.isEmpty()) {
-            return new String[0];
+    @Override
+    public void start(Channel<Row> output) throws Exception {
+        File file = new File(filePath);
+        if (!file.exists()) {
+            throw new IllegalArgumentException("文件不存在: " + filePath);
         }
 
-        List<String> result = new ArrayList<>();
+        // 读取文件行
+        var lines = FileUtil.readLines(file, StandardCharsets.UTF_8);
+        if (lines.isEmpty()) {
+            throw new IllegalArgumentException("CSV文件为空");
+        }
+
+        // 处理表头（跳过表头行）
+        int dataStart = hasHeader ? 1 : 0;
+
+        // 逐行解析并发布到通道
+        for (int i = dataStart; i < lines.size(); i++) {
+            String line = lines.get(i).trim();
+            if (line.isEmpty()) continue;
+
+            Row row = parseCsvLine(line);
+            output.publish(row); // 通过通道发布数据
+        }
+        output.close(); // 数据发送完毕后关闭通道
+    }
+
+    // 解析单行CSV数据（简化逻辑，保留核心功能）
+    private Row parseCsvLine(String line) {
+        Row row = new Row();
         StringBuilder current = new StringBuilder();
         boolean inQuotes = false;
 
         for (int i = 0; i < line.length(); i++) {
             char c = line.charAt(i);
-
             if (c == quoteChar) {
                 if (i + 1 < line.length() && line.charAt(i + 1) == quoteChar) {
                     current.append(quoteChar);
@@ -135,19 +85,18 @@ public class CsvInput implements IInput {
                     inQuotes = !inQuotes;
                 }
             } else if (c == delimiter && !inQuotes) {
-                result.add(current.toString());
+                row.add(current.toString());
                 current.setLength(0);
             } else {
                 current.append(c);
             }
         }
-
-        result.add(current.toString());
+        row.add(current.toString()); // 添加最后一个字段
 
         if (inQuotes) {
-            throw new IllegalArgumentException("CSV 行包含未闭合的引号: " + line);
+            throw new IllegalArgumentException("CSV行包含未闭合的引号: " + line);
         }
-
-        return result.toArray(new String[0]);
+//        System.out.println(row);
+        return row;
     }
 }
