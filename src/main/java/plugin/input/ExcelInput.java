@@ -16,7 +16,6 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook;
  */
 @Input(type="excel")
 public class ExcelInput implements IInput {
-    private Map<String, Object> config;
     private String filePath;
     private String sheetName;
     private boolean hasHeader;
@@ -26,8 +25,6 @@ public class ExcelInput implements IInput {
 
     @Override
     public void init(Map<String, Object> cfg) {
-        this.config = cfg;
-
         // 初始化配置参数
         this.filePath = (String) cfg.get("filePath");
         this.sheetName = (String) cfg.get("sheetName");
