@@ -1,6 +1,5 @@
 package org.gugu.etl;
 
-import core.Checker;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
