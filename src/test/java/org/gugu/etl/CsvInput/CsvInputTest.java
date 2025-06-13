@@ -8,7 +8,7 @@ import runtask.StepList;
 import java.util.Arrays;
 import java.util.Collections;
 
-public class TestCsvInput {
+public class CsvInputTest {
     @Test
     public void testCsvInput() throws InterruptedException {
         Step input = new Step();
