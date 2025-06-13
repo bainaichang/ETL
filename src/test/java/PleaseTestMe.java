@@ -15,7 +15,8 @@ import java.util.Collections;
 
 
 
-public class PleaseTestMe{
+public class PleaseTestMe {
+
     @Test
     public void test_csv_etl_flow() {
         Step input = new Step();
@@ -39,6 +40,9 @@ public class PleaseTestMe{
 
         new Scheduler(stepList).execute();
     }
+
+
+
     @Test
     public void test_http_etl_flow() {
         Step input = new Step();
@@ -64,6 +68,40 @@ public class PleaseTestMe{
 
     @Test
     public void test_json_etl_flow() {
+
+        // file 模式：从文件中读取数据
+        Step inputFile = new Step();
+        inputFile.withStepId(1)
+                .withDes("从文件读取包含 json 字段的文本")
+                .withDomain("input")
+                .withSubType("jsontext")
+                .withConfig("mode", "file")
+                .withConfig("filePath", "src/test/java/yh_json.txt");
+
+        // field 模式：从字段直接读取数据
+        Step inputField = new Step();
+        inputField.withStepId(1)
+                .withDes("从字段读取包含 json 字段的文本")
+                .withDomain("input")
+                .withSubType("jsontext")
+                .withConfig("mode", "field")
+                .withConfig("sourceField", "id,name,json_data\n" +
+                        "1,Alice,{\"age\":30,\"city\":\"New York\"}\n" +
+                        "2,Bob,{\"age\":25,\"city\":\"Los Angeles\"}\n" +
+                        "3,Charlie,{\"age\":35,\"city\":\"Chicago\"}")
+                .withConfig("jsonField","json_data")
+                .withConfig("delimiter", ",");
+
+        // url 模式（未实现）
+        Step inputUrl = new Step();
+        inputUrl.withStepId(1)
+                .withDes("从 URL 拉取数据")
+                .withDomain("input")
+                .withSubType("jsontext")
+                .withConfig("mode", "url")
+                .withConfig("url", "");
+
+
         Step input = new Step();
         input.withStepId(1)
                 .withDes("读取包含json字段的文本")
@@ -72,6 +110,7 @@ public class PleaseTestMe{
                 .withConfig("sourceType", "file")
                 .withConfig("filePath", "src/test/java/yh_json.txt");
 
+
         Step output = new Step();
         output.withStepId(2)
                 .withDes("输出到控制台")
@@ -79,8 +118,13 @@ public class PleaseTestMe{
                 .withSubType("console")
                 .withParentStepId(Collections.singletonList("1"));
 
-        StepList stepList = new StepList(Arrays.asList(input, output));
 
+        //file 模式
+        StepList stepList = new StepList(Arrays.asList(inputFile, output));
+        // field 模式
+        //StepList stepList = new StepList(Arrays.asList(inputField, output));
+        // 未来支持 url 模式
+        //StepList stepList = new StepList(Arrays.asList(inputUrl, output));
         new Scheduler(stepList).execute();
     }
     
@@ -130,3 +174,5 @@ public class PleaseTestMe{
         System.out.println(response);
     }
 }
+
+
