@@ -202,5 +202,7 @@ public class Scheduler {
         gate.await();
         pool.shutdown();
     }
-
+    static {
+        Checker.run("plugin", "anno");
+    }
 }
