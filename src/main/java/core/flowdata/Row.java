@@ -5,6 +5,19 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 public class Row extends ArrayList<Object> {
+    private boolean isHeader=false;
+
+    public Row() {
+
+    }
+    public Row(boolean isHeader) {
+        this.isHeader = isHeader;
+    }
+
+    public boolean isHeader() {
+        return isHeader;
+    }
+
     public Object get(String field, RowSetTable table) {
         // 传入一个字段,返回该字段的下标
         int index = table.getFieldIndex(field);
