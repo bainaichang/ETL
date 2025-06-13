@@ -40,6 +40,10 @@ public class ExcelInput implements IInput {
         if (filePath == null || filePath.isEmpty()) {
             throw new IllegalArgumentException("必须指定文件路径(filePath)");
         }
+        if (hasHeader && startRow ==0) {
+            System.err.println("警告：有头且开始行是0,自动修正");
+            this.startRow = 1;
+        }
     }
 
     @Override
