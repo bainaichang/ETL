@@ -4,6 +4,7 @@ import anno.Input;
 import cn.hutool.core.io.FileUtil;
 import core.Channel;
 import core.flowdata.Row;
+import core.flowdata.RowSetTable;
 import core.intf.IInput;
 import lombok.var;
 
@@ -43,33 +44,42 @@ public class CsvInput implements IInput {
     }
 
     @Override
-    public void start(Channel<Row> output) throws Exception {
+    public void start(Channel output) throws Exception {
         File file = new File(filePath);
         if (!file.exists()) {
             throw new IllegalArgumentException("文件不存在: " + filePath);
         }
 
-        // 读取文件行
         var lines = FileUtil.readLines(file, StandardCharsets.UTF_8);
         if (lines.isEmpty()) {
             throw new IllegalArgumentException("CSV文件为空");
         }
 
-        // 处理表头（跳过表头行）
         int dataStart = hasHeader ? 1 : 0;
 
-        // 逐行解析并发布到通道
+        if (hasHeader) {
+            String headerLine = lines.get(0).trim();
+            Row headerRow = parseCsvLine(headerLine);
+            RowSetTable table = headerRow.RowChangeTable(); // ✅ 用你自己的方法
+            output.setHeader(table);
+            System.out.println("[CsvInput] 表头设置完成: " + table);
+        }
+
+
         for (int i = dataStart; i < lines.size(); i++) {
             String line = lines.get(i).trim();
             if (line.isEmpty()) continue;
 
             Row row = parseCsvLine(line);
-            output.publish(row); // 通过通道发布数据
+            output.publish(row);
+            System.out.println("[CsvInput] 数据行已发送: " + row);
         }
-        output.close(); // 数据发送完毕后关闭通道
+
+        output.close();
     }
 
-    // 解析单行CSV数据（简化逻辑，保留核心功能）
+
+    // 解析单行CSV数据
     private Row parseCsvLine(String line) {
         Row row = new Row();
         StringBuilder current = new StringBuilder();

@@ -26,7 +26,7 @@ public class RowSetTable {
         this.field.addAll(field);
         this.rowList = rowList;
     }
-    
+
     public boolean haveField(String field) {
         return this.field.contains(field);
     }

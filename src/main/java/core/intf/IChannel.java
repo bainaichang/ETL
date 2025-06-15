@@ -1,5 +1,7 @@
 package core.intf;
 
+import core.flowdata.RowSetTable;
+
 import java.util.function.Consumer;
 
 public interface IChannel<T>{
@@ -10,4 +12,6 @@ public interface IChannel<T>{
     default void onReceive(Consumer<T> handler,Runnable onComplete){
         throw new UnsupportedOperationException("Option");
     }
+    RowSetTable getHeader();
+    void setHeader(RowSetTable table);
 }
