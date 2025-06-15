@@ -1,85 +1,88 @@
 package core;
 
+import core.flowdata.RowSetTable;
 import core.intf.IChannel;
 
 import java.util.LinkedList;
 import java.util.Queue;
+import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import java.util.function.Consumer;
 
-/*
-    生产者线程（publish） → 数据入队 → 唤醒消费者线程
-                                     ↓
-    消费者线程（subscribe）→ 从队列取出数据 → 调用Consumer处理
-                                     ↑
-    关闭通道（close） → 标记closed=true → 唤醒所有等待线程 → 关闭线程池
-*/
-public class Channel<T> implements IChannel<T> {
-    private final Queue<T> queue=new LinkedList<>();
-    //LinkedList筹备了两套操作，链表与队列
-    private final ExecutorService executor= Executors.newSingleThreadExecutor();
-    //单线程线程池 -> 1,1,0，milliseconds,LinkedBlockingQueue
-    private Consumer<T> consumer;
-    private volatile boolean closed=false;
+public class Channel implements IChannel<Object> {
+    private RowSetTable header = null;
+    private final Queue<Object> queue = new ConcurrentLinkedQueue();
+    private final CopyOnWriteArrayList<Consumer<Object>> subscribers = new CopyOnWriteArrayList<>();
+    private final CopyOnWriteArrayList<Runnable> completionHooks = new CopyOnWriteArrayList<>();
+    private volatile boolean closed = false;
+    private final ExecutorService pool;
+
+    public Channel(ExecutorService pool) {
+        this.pool = pool;
+    }
 
     @Override
-    public synchronized void publish(T row) throws InterruptedException{
-        if(closed) throw new IllegalStateException("通道已关闭");
+    public RowSetTable getHeader() {
+        return header;
+    }
+
+    @Override
+    public void setHeader(RowSetTable header) {
+        this.header = header;
+    }
+
+    @Override
+    public void publish(Object row) {
+        if (closed) {
+            System.err.println("⚠️ Channel 已关闭，丢弃数据: " + row);
+            return;
+        }
         queue.offer(row);
-        notifyAll();
+        for (Consumer<Object> consumer : subscribers) {
+            pool.submit(() -> consumer.accept(row));
+        }
     }
 
     @Override
-    public synchronized void subscribe(Consumer<T> consumer){
-        this.consumer=consumer;
-        executor.submit(()-> {
-            try {
-                while (!closed || !queue.isEmpty()) {
-                    T row;
-                    synchronized (this) {
-                        while (queue.isEmpty() && closed) wait();
-                        row = queue.poll();
-                    }
-                    if (row != null && consumer != null)
-                        consumer.accept(row);
-                }
-            } catch (InterruptedException e) {
+    public void onReceive(Consumer<Object> handler, Runnable onComplete) {
+        this.subscribers.add(handler);
+        if (onComplete != null) {
+            this.completionHooks.add(onComplete);
+        }
+
+        Object row;
+        while ((row = queue.poll()) != null) {
+            final Object r = row;
+            pool.submit(() -> handler.accept(r));
+        }
+
+        if (closed) {
+            for (Runnable hook : completionHooks) {
+                pool.submit(hook);
             }
-        });
+        }
+    }
+
+
+    @Override
+    public void subscribe(Consumer<Object> consumer) {
+        this.onReceive(consumer, null);
     }
 
     @Override
-    public synchronized void close(){
-        closed=true;
-        notifyAll();
-//        executor.shutdown();
+    public synchronized void close() {
+        if (!closed) {
+            closed = true;
+            System.out.println("✅ Channel 已关闭");
+            for (Runnable hook : completionHooks) {
+                pool.submit(hook);
+            }
+        }
     }
 
     @Override
-    public boolean isClosed(){
+    public boolean isClosed() {
         return closed;
-    }
-
-    @Override
-    public  synchronized void onReceive(Consumer<T> handler,Runnable onComplete){
-        this.consumer=handler;
-        executor.submit(()->{
-           try{
-               while (!closed||!queue.isEmpty()){
-                   T row;
-                   synchronized (this){
-                       while(queue.isEmpty()&&!closed) wait();
-                       row=queue.poll();
-                   }
-                   if(row!=null&&consumer!=null)
-                       consumer.accept(row);
-               }
-           }catch (InterruptedException e){}
-           finally {
-                if(onComplete!=null)
-                    onComplete.run();
-           }
-        });
     }
 }
