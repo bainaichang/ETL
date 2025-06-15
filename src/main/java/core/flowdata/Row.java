@@ -1,12 +1,13 @@
 package core.flowdata;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 public class Row extends ArrayList<Object> {
     private boolean isHeader=false;
-
     public Row() {
 
     }
@@ -17,6 +18,19 @@ public class Row extends ArrayList<Object> {
     public boolean isHeader() {
         return isHeader;
     }
+    public Row copy() {
+        Row copy = new Row(this.isHeader);
+        for (Object item : this) {
+            copy.add(item);
+        }
+        return copy;
+    }
+
+    public  RowSetTable RowChangeTable() {
+        List<String> field = this.stream().map(e -> e.toString()).collect(Collectors.toList());
+        return new RowSetTable(field);
+    }
+
 
     public Object get(String field, RowSetTable table) {
         // 传入一个字段,返回该字段的下标
