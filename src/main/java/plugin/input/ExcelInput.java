@@ -44,7 +44,7 @@ public class ExcelInput implements IInput {
     }
 
     @Override
-    public void start(Channel<Row> output) throws Exception {
+    public void start(Channel output) throws Exception {
         try {
             // 创建文件对象并验证存在性
             File file = new File(filePath);
