@@ -27,7 +27,7 @@ public class Row extends ArrayList<Object> {
     }
 
     public  RowSetTable RowChangeTable() {
-        List<String> field = this.stream().map(e -> e.toString()).collect(Collectors.toList());
+        List<String> field = this.stream().map(Object::toString).collect(Collectors.toList());
         return new RowSetTable(field);
     }
 
