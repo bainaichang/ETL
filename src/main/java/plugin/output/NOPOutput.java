@@ -5,6 +5,7 @@ import core.Channel;
 import core.intf.IOutput;
 
 import java.util.Map;
+import java.util.function.Consumer;
 
 @Output(type = "nop")
 public class NOPOutput implements IOutput {
@@ -15,6 +16,9 @@ public class NOPOutput implements IOutput {
     
     @Override
     public void consume(Channel input) throws Exception {
-    
+        input.subscribe(o -> {
+            String a = o.toString();
+            System.out.println(a);
+        });
     }
 }

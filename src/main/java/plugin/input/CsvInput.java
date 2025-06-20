@@ -5,17 +5,12 @@ import cn.hutool.core.io.FileUtil;
 import core.Channel;
 import core.ThreadPoolManger;
 import core.flowdata.Row;
-import core.flowdata.RowSetTable;
 import core.intf.IInput;
 import lombok.var;
 
 import java.io.*;
-import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.ExecutionException;
+import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
 
@@ -56,6 +51,7 @@ public class CsvInput implements IInput {
         File file = new File(filePath);
         long fileLength = file.length();
         if (fileLength < fileBlockSize) {
+            // 文件过小不需要分块
             var lines = FileUtil.readLines(file, StandardCharsets.UTF_8);
             int dataStart = hasHeader ? 1 : 0;
             if (lines.isEmpty()) {
@@ -75,7 +71,7 @@ public class CsvInput implements IInput {
         }
         ExecutorService threadPool = ThreadPoolManger.getThreadPool();
         RandomAccessFile reader = new RandomAccessFile(file, "r");
-        List<Future> futureList = new ArrayList<>();
+        List<Future> futureList = new LinkedList<>();
         // 设置列名
         long headerEnd = this.getNextCRLocationNoEOF(reader);
         byte[] headerBytes = new byte[(int) headerEnd];
@@ -85,8 +81,30 @@ public class CsvInput implements IInput {
         output.setHeader(row.RowChangeTable());
         // 向上取整获取分块数量
         long blockSize = (fileLength + fileBlockSize + 1) / fileBlockSize;
+        System.out.println("总块数: " + blockSize);
         // 处理除了最后一个块
-        for (long i = 0; i < blockSize - 1; i++) {
+        
+        Future<?> first = threadPool.submit(() -> {
+            try {
+                long offer = 0;
+                RandomAccessFile threadReader = new RandomAccessFile(file, "r");
+                long begin = headerEnd;
+                long end = offer + fileBlockSize;
+                threadReader.seek(end);
+                end = this.getNextCRLocationNoEOF(threadReader);
+                byte[] bytes = this.readerBytes(reader, begin, end);
+                List<Row> data = this.parseCsvString(bytes);
+                for (Row datum : data) {
+                    output.publish(datum);
+//                    System.out.println(datum);
+                }
+//                System.out.printf("开始字节:%d, 结束字节:%d\n", begin, end);
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        });
+        futureList.add(first);
+        for (long i = 1; i < blockSize - 1; i++) {
             long offer = i * this.fileBlockSize;
             Future<?> submit = threadPool.submit(() -> {
                 try {
@@ -94,39 +112,62 @@ public class CsvInput implements IInput {
                     threadReader.seek(offer);
                     long begin = offer;
                     long end = offer + fileBlockSize;
-                    begin = this.getPrevCRLocation(threadReader);
+                    begin = this.getNextCRLocationNoEOF(threadReader);
                     threadReader.seek(end);
-                    end = this.getPrevCRLocation(threadReader);
-                    System.out.printf("开始字节:%d, 结束字节:%d\n", begin, end);
+                    end = this.getNextCRLocationNoEOF(threadReader);
+                    byte[] bytes = this.readerBytes(reader, begin, end);
+                    List<Row> data = this.parseCsvString(bytes);
+                    for (Row datum : data) {
+                        output.publish(datum);
+//                        System.out.println(datum);
+                    }
+//                    System.out.printf("开始字节:%d, 结束字节:%d\n", begin, end);
+                    double v = (double) end / (double) reader.length() * 100;
+                    System.out.printf("%2f%%", v);
+                    System.out.println();
                 } catch (Exception e) {
                     throw new RuntimeException(e);
                 }
             });
             futureList.add(submit);
+            // 等待前面任务完成
+            if (i % 3000 == 0) {
+                Iterator<Future> iterator = futureList.iterator();
+                while (iterator.hasNext()) {
+                    Future next = iterator.next();
+                    next.get();
+                    iterator.remove();
+                }
+            }
+            System.out.println(futureList.size());
         }
         Future<?> last = threadPool.submit(() -> {
             try {
                 RandomAccessFile threadReader = new RandomAccessFile(file, "r");
                 long offer = (blockSize - 1) * fileBlockSize;
                 threadReader.seek(offer);
-                long begin = offer;
+                long begin;
                 long end = Math.min(offer + fileBlockSize, threadReader.length());
-                begin = this.getPrevCRLocation(threadReader);
+                begin = this.getNextCRLocationNoEOF(threadReader);
                 threadReader.seek(end);
-                end = this.getPrevCRLocation(threadReader);
-                System.out.printf("end: 开始字节:%d, 结束字节:%d\n", begin, end);
+                end = this.getNextCRLocationHaveEOF(threadReader);
+                byte[] bytes = this.readerBytes(reader, begin, end);
+                List<Row> data = this.parseCsvString(bytes);
+                for (Row datum : data) {
+                    output.publish(datum);
+//                    System.out.println(datum);
+                }
             } catch (Exception e) {
                 throw new RuntimeException(e);
             }
         });
         futureList.add(last);
-        futureList.forEach(future -> {
-            try {
-                future.get();
-            } catch (InterruptedException | ExecutionException e) {
-                throw new RuntimeException(e);
-            }
-        });
+        Iterator<Future> iterator = futureList.iterator();
+        while (iterator.hasNext()) {
+            Future next = iterator.next();
+            next.get();
+            iterator.remove();
+        }
         output.close();
         reader.close();
     }
@@ -170,26 +211,24 @@ public class CsvInput implements IInput {
         }
     }
     
-    public long getPrevCRLocation(RandomAccessFile reader) throws Exception {
-        long location = reader.getFilePointer();
-        byte[] bytes = new byte[16];
-        if (reader.getFilePointer() == 0) {
-            return 0;
+    
+    private byte[] readerBytes(RandomAccessFile reader, long begin, long end) throws Exception {
+        begin++;
+        long length = end - begin;
+        byte[] bytes = new byte[Math.toIntExact(length)];
+        reader.seek(begin);
+        reader.read(bytes);
+        return bytes;
+    }
+    private List<Row> parseCsvString(byte[] bytes) {
+        String s = new String(bytes, StandardCharsets.UTF_8);
+        List<Row> list = new ArrayList<>();
+        String[] split = s.split("\n");
+        for (String string : split) {
+            Row row = this.parseCsvLine(string);
+            list.add(row);
         }
-        while (true) {
-            reader.seek(reader.getFilePointer() - 16);
-            reader.read(bytes);
-            reader.seek(reader.getFilePointer() - 16);
-            for (int offer = 0; offer < bytes.length; offer++) {
-                if ((char) bytes[offer] == '\n') {
-                    // 还原文件指针
-//                    location = reader.getFilePointer();
-                    reader.seek(location);
-                    return reader.getFilePointer() + offer;
-                }
-            }
-            reader.seek(reader.getFilePointer() + 32);
-        }
+        return list;
     }
     
     // 解析单行CSV数据
@@ -219,7 +258,6 @@ public class CsvInput implements IInput {
         if (inQuotes) {
             throw new IllegalArgumentException("CSV行包含未闭合的引号: " + line);
         }
-//        System.out.println(row);
         return row;
     }
 }

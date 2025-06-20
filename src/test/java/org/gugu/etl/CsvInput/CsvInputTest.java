@@ -16,7 +16,7 @@ import java.util.Collections;
 public class CsvInputTest {
     @Test
     public void testCsvInput() throws Exception {
-        String path = "C:\\Users\\白乃常\\Desktop\\20kb.csv";
+        String path = "E:\\StudySoft\\学习\\ETL\\1GB.csv";
         Step input = new Step();
         input.withStepId(1)
              .withDes("读取csv文件")
@@ -38,19 +38,7 @@ public class CsvInputTest {
         StepList stepList = new StepList(Arrays.asList(input, output));
 
         new Scheduler(stepList).execute();
-        for (int i = 4099; i < 4120; i++) {
-            System.out.println(getHexValueAtPosition(path, i));
-        }
-        printFile(path);
     }
-    
-//    @Test
-//    public void IOTest() throws Exception {
-//        String path = "C:\\Users\\白乃常\\Desktop\\20kb.csv";
-//        RandomAccessFile reader = new RandomAccessFile(path, "r");
-//        reader.seek(0L);
-//        printFile(path);
-//    }
     
     
     
