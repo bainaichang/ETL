@@ -4,6 +4,9 @@ target/
 !**/src/main/**/target/
 !**/src/test/**/target/
 
+# 排除src/old文件夹及其内容
+**/src/old/**
+
 ### STS ###
 .apt_generated
 .classpath

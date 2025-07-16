@@ -14,7 +14,7 @@ public class TestStepList {
                 .withDes("读取csv文件")
                 .withDomain("input")
                 .withSubType("csv")
-                .withConfig("filePath", "src/test/java/org/gugu/etl/CsvInput/gugugu.csv")
+                .withConfig("filePath", "src/test/java/org/gugu/etl/CsvInput/smallFile.csv")
                 .withConfig("delimiter", ",")
                 .withConfig("quoteChar", "\"")
                 .withConfig("hasHeader", true);
