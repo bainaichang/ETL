@@ -15,17 +15,7 @@ import java.util.Map;
 
 public class JsonInputTest {
 
-    // 用于测试文件模式的纯 JSON 文件路径
-    // 请确保在 src/test/java/org/gugu/etl/JsonInput/ 目录下创建此文件
-    // 文件内容示例 (testData.json):
-    // {
-    //   "status": "success",
-    //   "data": [
-    //     {"id": 1, "name": "Alice", "details": {"age": 30, "city": "New York"}},
-    //     {"id": 2, "name": "Bob", "details": {"age": 25, "city": "Los Angeles"}},
-    //     {"id": 3, "name": "Charlie", "details": {"age": 35, "city": "Chicago"}}
-    //   ]
-    // }
+
     private static final String TEST_FILE_PATH = "src/test/java/org/gugu/etl/JsonInput/data.json";
 
     /**

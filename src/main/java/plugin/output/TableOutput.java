@@ -1,11 +1,10 @@
 package plugin.output;
 
 import anno.Output;
-import core.Channel; // 导入 Channel 类
+import core.Channel;
 import core.flowdata.RowSetTable;
-import core.intf.IOutput; // 导入 IOutput 接口
-import tool.Log; // 导入 Log 工具类
-
+import core.intf.IOutput;
+import tool.Log;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;

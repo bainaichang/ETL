@@ -1,11 +1,9 @@
 package plugin.output;
-
 import anno.Output;
 import core.Channel;
 import core.flowdata.RowSetTable;
 import core.intf.IOutput;
 import tool.Log;
-
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicLong;
 

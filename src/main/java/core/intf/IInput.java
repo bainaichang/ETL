@@ -1,9 +1,6 @@
 package core.intf;
 
 import core.Channel;
-import core.flowdata.Row;
-import core.flowdata.RowSetTable;
-
 import java.util.List;
 import java.util.Map;
 

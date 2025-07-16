@@ -1,6 +1,5 @@
 package core.flowdata;
 
-import ch.qos.logback.classic.spi.EventArgUtil;
 import core.intf.RowLive;
 import core.intf.RowSelect;
 import core.intf.RowUpdate;

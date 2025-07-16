@@ -3,7 +3,6 @@ package org.gugu.etl.StepList;
 import org.junit.jupiter.api.Test;
 import runtask.Step;
 import runtask.StepList;
-
 import java.util.Collections;
 
 public class TestStepList {

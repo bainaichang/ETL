@@ -13,7 +13,6 @@ import core.flowdata.Row;
 import core.flowdata.RowSetTable;
 import core.intf.IInput;
 import tool.Log;
-
 import java.io.File;
 import java.nio.charset.StandardCharsets;
 import java.util.*;

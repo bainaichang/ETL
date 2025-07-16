@@ -6,7 +6,6 @@ import core.intf.IProcess;
 import core.Channel;
 import anno.Process;
 import tool.Log;
-
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;

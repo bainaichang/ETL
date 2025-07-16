@@ -1,5 +1,4 @@
 package core;
-
 import core.intf.IInput;
 import core.intf.IOutput;
 import core.intf.IProcess;

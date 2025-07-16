@@ -1,5 +1,4 @@
 package core;
-
 import anno.Input;
 import anno.Output;
 import anno.Process;

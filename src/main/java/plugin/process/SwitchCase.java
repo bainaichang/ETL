@@ -6,7 +6,6 @@ import core.flowdata.Row;
 import core.flowdata.RowSetTable;
 import core.intf.IProcess;
 import tool.Log;
-
 import java.math.BigDecimal;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;

@@ -4,7 +4,6 @@ import core.Scheduler;
 import runtask.Step;
 import runtask.StepList;
 import org.junit.jupiter.api.Test;
-
 import java.util.Arrays;
 import java.util.Collections;
 
@@ -20,7 +19,7 @@ public class ExcelInputTest {
                 .withDes("读取Excel-静态路径")
                 .withDomain("process")
                 .withSubType("excel")
-                .withConfig("filePath", "src/test/java/org/gugu/etl/ExcelInput/orange.xlsx")
+                .withConfig("filePath", "src/test/java/org/gugu/etl/ExcelInput/data.xlsx")
 //                .withConfig("sheetName", "NoHeaderData")
                 .withConfig("sheetName", "StandardData")
                 .withConfig("headerRow", true)

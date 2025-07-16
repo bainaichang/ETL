@@ -1,5 +1,4 @@
-package plugin.process; // Changed package name to reflect its type
-
+package plugin.input; // Changed package name to reflect its type
 import anno.Process; // Changed annotation type
 import core.Channel;
 import core.flowdata.Row;

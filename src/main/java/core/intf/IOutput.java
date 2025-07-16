@@ -1,5 +1,4 @@
 package core.intf;
-
 import core.Channel;
 import core.flowdata.Row;
 

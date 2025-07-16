@@ -29,7 +29,6 @@ public class TableOutputTest {
                 .withConfig("tableName", "people");  // 数据库表名
 
         StepList stepList = new StepList(Arrays.asList(input, output));
-
 //        new Scheduler(stepList).execute();
     }
 }

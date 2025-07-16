@@ -4,7 +4,6 @@ import core.Scheduler;
 import org.junit.jupiter.api.Test;
 import runtask.Step;
 import runtask.StepList;
-
 import java.util.Arrays;
 import java.util.Collections;
 

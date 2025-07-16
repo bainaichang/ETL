@@ -1,5 +1,6 @@
 package tool;
 
+
 public class Tuning {
 
     static final int CPU = Runtime.getRuntime().availableProcessors();
