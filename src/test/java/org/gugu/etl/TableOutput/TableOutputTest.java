@@ -14,7 +14,7 @@ public class TableOutputTest {
                 .withDes("读取csv文件")
                 .withDomain("input")
                 .withSubType("csv")
-                .withConfig("filePath", "src/test/java/org/gugu/etl/CsvInput/gugugu.csv")
+                .withConfig("filePath", "src/test/java/org/gugu/etl/CsvInput/smallFile.csv")
                 .withConfig("delimiter", ",")
                 .withConfig("quoteChar", "\"")
                 .withConfig("hasHeader", true);
@@ -29,7 +29,6 @@ public class TableOutputTest {
                 .withConfig("tableName", "people");  // 数据库表名
 
         StepList stepList = new StepList(Arrays.asList(input, output));
-
 //        new Scheduler(stepList).execute();
     }
 }

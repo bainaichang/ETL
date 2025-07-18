@@ -1,5 +1,4 @@
 package core.intf;
-
 import core.flowdata.RowSetTable;
 
 import java.util.function.Consumer;
