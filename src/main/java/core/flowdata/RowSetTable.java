@@ -16,6 +16,9 @@ public class RowSetTable {
     @Setter
     private List<Row> rowList = new ArrayList<>();
     private final List<String> field = new LinkedList<>();
+    @Getter
+    @Setter
+    private String mainKey;
     
     public RowSetTable(List<String> field) {
         this.field.addAll(field);
@@ -26,6 +29,18 @@ public class RowSetTable {
         this.rowList = rowList;
     }
 
+    
+    public List<String> getUpdate(String table){
+        if (this.mainKey == null){
+            return null;
+        }
+        List<String> result = new ArrayList<>();
+        for (Row row : this.rowList) {
+            String updateSQL = row.toUpdateSQL(this);
+            result.add(updateSQL);
+        }
+        return result;
+    }
     public boolean haveField(String field) {
         return this.field.contains(field);
     }
@@ -158,5 +173,21 @@ public class RowSetTable {
     
     public List<String> getField() {
         return field;
+    }
+    public RowSetTable except(RowSetTable target) {
+        // 差集
+        RowSetTable result = new RowSetTable(this.field);
+        for (Row row : this.rowList) {
+            RowSetTable where = target.where(row::equals);
+            if (where.rowList.size() != 1) {
+                result.addRow(row);
+            }
+        }
+        return result;
+    }
+    public RowSetTable intersect(RowSetTable target) {
+        // 交集
+        RowSetTable except = this.except(target);
+        return this.except(except);
     }
 }

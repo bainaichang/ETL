@@ -1,4 +1,5 @@
 package core.flowdata;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -6,17 +7,20 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 public class Row extends ArrayList<Object> {
-    private boolean isHeader=false;
+    private boolean isHeader = false;
+    
     public Row() {
-
+    
     }
+    
     public Row(boolean isHeader) {
         this.isHeader = isHeader;
     }
-
+    
     public boolean isHeader() {
         return isHeader;
     }
+    
     public Row copy() {
         Row copy = new Row(this.isHeader);
         for (Object item : this) {
@@ -24,13 +28,14 @@ public class Row extends ArrayList<Object> {
         }
         return copy;
     }
-
-    public  RowSetTable RowChangeTable() {
-        List<String> field = this.stream().map(e -> e.toString()).collect(Collectors.toList());
+    
+    public RowSetTable RowChangeTable() {
+        List<String> field = this.stream()
+                                 .map(e -> e.toString())
+                                 .collect(Collectors.toList());
         return new RowSetTable(field);
     }
-
-
+    
     public Object get(String field, RowSetTable table) {
         // 传入一个字段,返回该字段的下标
         int index = table.getFieldIndex(field);
@@ -50,6 +55,7 @@ public class Row extends ArrayList<Object> {
         }
         this.set(index, newValue);
     }
+    
     public String toInsertSQL(String[] field, String tableName) {
         // 返回一行数据的sql形式,insert into语句
         if (field.length != this.size()) {
@@ -57,12 +63,35 @@ public class Row extends ArrayList<Object> {
             return null;
         }
         StringBuffer sql = new StringBuffer("insert into ");
-        sql.append(tableName).append("(");
-        sql.append(String.join(", ", field)).append(") values (");
+        sql.append(tableName)
+           .append("(");
+        sql.append(String.join(", ", field))
+           .append(") values (");
         List<String> values = this.stream()
-                                   .map(Object::toString)
-                                   .collect(Collectors.toList());
-        sql.append(String.join(", ", values)).append(");");
+                                  .map(Object::toString)
+                                  .collect(Collectors.toList());
+        sql.append(String.join(", ", values))
+           .append(");");
         return sql.toString();
+    }
+    
+    public String toUpdateSQL(RowSetTable table) {
+        List<String> setList = new ArrayList<>();
+        StringBuilder sb = new StringBuilder();
+        sb.append("UPDATE ")
+          .append(table.getTbName())
+          .append(" SET ");
+        for (String s : table.getField()) {
+            if (s.equals(table.getMainKey())) {
+                continue;
+            }
+            setList.add(s + " = " + this.get(s, table));
+        }
+        sb.append(String.join(", ", setList))
+          .append(" where ");
+        sb.append(table.getMainKey())
+          .append(" = ")
+          .append(this.get(table.getMainKey(), table));
+        return sb.toString();
     }
 }
